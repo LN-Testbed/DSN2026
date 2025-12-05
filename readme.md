@@ -46,9 +46,9 @@ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyring
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
 # Add the repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+echo 
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu 
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | 
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 ```
@@ -81,7 +81,7 @@ sudo apt install git
 Navigate to the Documents directory in your home directory.
 
 ```
-cd ~\/Documents
+cd ~/Documents
 ```
 
 Create a directory for LNBot and Bitcoin core to live in. In our testing environment we named it “LNBot_research_project”. 
@@ -128,8 +128,8 @@ Do not run bitcoin-core just yet.
 We will create a config file for the bitcoin core server to use. This way the bitcoin server will start as a regtest with the same server everytime. Change your directory to */.bitcoin*, if the directory doesn’t exist create it.
 
 ```
-mkdir ~\.bitcoin #if the directory doesn’t exist  
-cd ~\.bitcoin  
+mkdir ~/.bitcoin #if the directory doesn’t exist  
+cd ~/.bitcoin  
 nano bitcoin.conf
 ```
 
@@ -177,8 +177,8 @@ We will create a config file for the lightning daemons to use. We will set the r
 Change your directory to */.lightning*, if the directory doesn’t exist create it.
 
 ```
-mkdir ~\.lightning #if the directory doesn’t exist  
-cd ~\.lightning
+mkdir ~/.lightning #if the directory doesn’t exist  
+cd ~/.lightning
 ```
 
 Here we create the configuration file for lighting.
@@ -212,7 +212,7 @@ We will start the bitcoin server and verify that it is starting as a regtest env
 Change directories to where the bitcoin-core files are located. This assumes you followed the exact same file structure as we did.
 
 ```
-cd ~\/Documents\/LNBot_research_project\/bitcoin\/bin  
+cd ~/Documents/LNBot_research_project/bitcoin/bin  
 ./bitcoind 
 ```
 
@@ -239,7 +239,7 @@ It is important to note that the script uses hard paths to find the necessary fi
 ### Clone the repo using git
 
 ```
-cd ~\/Documents\/LNBot_research_project  
+cd ~/Documents/LNBot_research_project  
 git clone https://github.com/LN-Testbed/DSN2026.git
 ```
 
