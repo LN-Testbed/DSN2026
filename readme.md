@@ -40,7 +40,7 @@ Detailed logs for debugging specific node behaviors are stored in:
 
 This testbed has been verified on the following Linux distributions:
 
-* Ubuntu 24.04.3 LTS
+* Ubuntu 24.04 LTS
 * Ubuntu 25.04
 
 This guide assumes that the user is starting from a fresh install of Ubuntu.
