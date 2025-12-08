@@ -1,3 +1,36 @@
+# LNTest
+
+A testbed for a distributed Lightning network on one machine, using production grade Bitcoin Core and Core Lightning nodes orchestrated via Docker on a Bitcoin regtest environment.
+
+# Table of Contents
+
+- [LNTest](#lntest)
+- [Table of Contents](#table-of-contents)
+- [Architecture](#architecture)
+- [Pre-requisites \& Compatibility](#pre-requisites--compatibility)
+- [Set-up](#set-up)
+  - [1. Create directory for LNBot and the Bitcoin-Core files](#1-create-directory-for-lnbot-and-the-bitcoin-core-files)
+  - [2. Install Bitcoin-core](#2-install-bitcoin-core)
+  - [3. Create bitcoin and lightning configs](#3-create-bitcoin-and-lightning-configs)
+    - [3.1 Create bitcoin config](#31-create-bitcoin-config)
+    - [3.2 Create lightning config](#32-create-lightning-config)
+    - [3.3 Test Bitcoin environment](#33-test-bitcoin-environment)
+  - [4. Setting up LNBot](#4-setting-up-lnbot)
+    - [4.1 Clone the repo using git](#41-clone-the-repo-using-git)
+    - [4.2 Copy and Modify config.env.template](#42-copy-and-modify-configenvtemplate)
+  - [5. Downloading python dependencies](#5-downloading-python-dependencies)
+  - [6. Running lntest](#6-running-lntest)
+- [Commands and Scripts](#commands-and-scripts)
+    - [Script](#script)
+    - [lntest](#lntest-1)
+    - [kill\_nodes.sh](#kill_nodessh)
+    - [cleanup\_lightning\_nodes.sh](#cleanup_lightning_nodessh)
+    - [restart\_bitcoin.sh](#restart_bitcoinsh)
+- [Common Problems and Fixes](#common-problems-and-fixes)
+    - [Bitcoin error](#bitcoin-error)
+    - [Bitcoin lock error](#bitcoin-lock-error)
+
+
 # Architecture
 
 The botnet has 5 essential components. We have the main tester script that runs on the host machine, the Innocent Node, Botmaster Node and the CC Server Nodes, all of which run on individual docker containers running a custom docker image that is essentially the “elementsproject/lightningd:v25.09” image with python installed. Finally we have bitcoin core running a regtest server on the host machine to simulate the bitcoin network.
@@ -63,7 +96,7 @@ Install venv for python so we can create the virtual environments.
 ```bash
 sudo apt install python3-venv -y
 ```
-1
+
 ### Docker
 
 All lightning nodes will be individual docker containers. Reference the following guide, the pertinent instructions have been provided.
@@ -115,7 +148,7 @@ sudo apt install git
 ```
 # Set-up
 
-## Create directory for LNBot and the Bitcoin-Core files
+## 1. Create directory for LNBot and the Bitcoin-Core files
 
 Navigate to the Documents directory in your home directory.
 
@@ -132,7 +165,7 @@ cd LNBot_research_project
 
 Note: If you name this directory something else, remember to modify the “config.env” file in the cloned LNBot repo.
 
-## Install Bitcoin-core
+## 2. Install Bitcoin-core
 
 Download the bitcoin core tar file from [https://bitcoincore.org/en/download/](https://bitcoincore.org/en/download/) and move this file into the LNBot_research_project directory.
 
@@ -160,9 +193,9 @@ The directory should currently look like this.
 
 Do not run bitcoin-core just yet.
 
-## Create bitcoin and lightning configs
+## 3. Create bitcoin and lightning configs
 
-### Create bitcoin config
+### 3.1 Create bitcoin config
 
 We will create a config file for the bitcoin core server to use. This way the bitcoin server will start as a regtest with the same server everytime. Change your directory to */.bitcoin*, if the directory doesn’t exist create it.
 
@@ -210,7 +243,7 @@ fallbackfee=0.00001
 
 **Remember** the **username** and **password** you used here since we have to use the same credentials for the configs being passed into the lightning containers.
 
-Create lightning config  
+### 3.2 Create lightning config  
 We will create a config file for the lightning daemons to use. We will set the rpcusername and rpcpassword that these C&C nodes will be using to connect to the bitcoin regtest network.
 
 Change your directory to */.lightning*, if the directory doesn’t exist create it.
@@ -244,7 +277,7 @@ The **username** and **password** here should match the credentials placed into 
 
 At this point the configuration for the testing setup on the host machine is complete. The last requirement is to modify the testing files and double check that the path files are correct relative to your directory paths.
 
-## Test Bitcoin environment
+### 3.3 Test Bitcoin environment
 
 We will start the bitcoin server and verify that it is starting as a regtest environment.
 
@@ -269,13 +302,13 @@ We’re looking for this specifically. ![regtest-proof](images/regtest-proof.png
 
 Note: You can add bitcoind and bitcoin-cli to your path environment if you want to start and stop bitcoin-core without having to run them in this directory specifically.
 
-## Setting up LNBot
+## 4. Setting up LNBot
 
 Using git, we will download the repo containing LNTest. Keep in mind that this is a self contained testing suite and will not communicate outside of the host machine, hence why we did not need to open up any ports in the previous steps. We will then copy the “config.env.template” to “config.env” and modify the variables inside the file to match your unique system.
 
 It is important to note that the script uses hard paths to find the necessary files to run. This is because we use sudo to run the tester files (docker requires sudo unless you are part of the docker group) and so the tester file will look in “root”s home directory for those files unless a hard path is used instead.
 
-### Clone the repo using git
+### 4.1 Clone the repo using git
 
 ```bash
 cd ~/Documents/LNBot_research_project  
@@ -285,7 +318,7 @@ git clone https://github.com/LN-Testbed/DSN2026.git LNBot
 The final directory structure inside the LNBot_research_project should appear as follows:  
 ![lntest-dir](images/lntest-dir.png)
 
-### Copy and Modify config.env.template
+### 4.2 Copy and Modify config.env.template
 
 With LNBot now on your system, copy the config.env.template as config.env. This file is located at the root level of LNBot.
 
@@ -311,7 +344,7 @@ Change the “BASE_DIR” to match your directory structure if you did not use t
 This should be the path to where the bitcoin and LNBot directories are living.  
 ![config-base-dir](images/config-base-dir.png)
 
-## Downloading python dependencies
+## 5. Downloading python dependencies
 
 From here we’re going to create a virtual environment for python, activate it and then install the required libraries.
 
@@ -323,14 +356,14 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Running lntest
+## 6. Running lntest
 
 The python script “lntest” is the main script for testing the Lightning Botnet. It is responsible for creating the containers, managing memory, sending the initial botnet commands for propagation and then tearing everything down for subsequent tests.
 
 Because this script manages memory and deals with running docker files, it must be run as sudo, however doing so will use the root’s path for python, which means that we lose the dependencies we just installed. To use the correct interpreter, we need to run sudo with an absolute path to the correct python interpreter. Run lntest.
 
 ```bash
-sudo venv/bin/python lntest --small
+sudo venv/bin/python lntest.py --small
 ```
 
 This will start a small gamut of tests to see if everything is set up correctly. Progress can be monitored in the logs in the log directory, with the status of each node stored in the status directory.
@@ -339,7 +372,7 @@ Data collected will be in the “data/” directory.
 
 Important: Remember to save your data to a separate directory after each run since the script will overwrite any data that is stored there.
 
-# Commands and Script
+# Commands and Scripts
 
 An overview of the useful scripts contained in this setup. This section will be written as:
 
@@ -350,7 +383,7 @@ Description of what this script does.
 
 ### lntest
 ```bash
-sudo venv/bin/python lntest
+sudo venv/bin/python lntest.py
 ```  
 Use “-h” to bring up the help screen to see the possible commands.  
 Can choose between “--full”, “--small” and “--test”.  
@@ -398,7 +431,12 @@ Having “--num_cc 30” will start num_cc tests at 30 and will create 30 C&C se
 --bm_pos #
 ```
 
-- Position where the botmaster will connect to in the network
+- Position where the botmaster will connect to in the network. Percentage based
+  - <0 = random
+  - 0 = 0% = bottom / oldest
+  - 50 = 50% = middle
+  - 100 = 100% = top / youngest
+  - >100 = bottom + middle + top (bm_cc each)
 
 ```
 --max_msg #
@@ -421,7 +459,7 @@ Having “--num_cc 30” will start num_cc tests at 30 and will create 30 C&C se
 ### kill_nodes.sh
 
 ```bash
-sudo ./kill_nodes
+sudo ./kill_nodes.sh
 ```  
 Stops and removes all docker nodes created during the test.  
 Clears out shared memory.  
@@ -455,6 +493,7 @@ Some common problems that can pop up from time to time.
 If you run into bitcoin errors as the testing starts, usually with a description of loading wallet or some such. This is usually because bitcoin core was already running and the script couldn’t shut it down properly or the device was shutdown while bitcoin-core was still running.
 
 You will need to find the pid of bitcoin-core and kill it, sometimes forcefully if it will not exit out with a normal kill command.
+You may need to run pkill as sudo.
 
 ```bash
 pkill -9 bitcoind
